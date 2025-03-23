@@ -74,6 +74,11 @@ class MemorySharedNumpyArray(object):
             ct.c_double,
         ]
 
+        # Map fixed-length string types to ctypes arrays
+        typecodes = {np.dtype(ctype).str: ctype for ctype in simple_types}
+        typecodes["|S256"] = ct.c_char * 256  # Fixed-length string (256 bytes)
+        typecodes["|S64"] = ct.c_char * 64  # Fixed-length string (64 bytes)
+
         return {np.dtype(ctype).str: ctype for ctype in simple_types}
 
     def get_numpy_handle(self, reshape=True):
