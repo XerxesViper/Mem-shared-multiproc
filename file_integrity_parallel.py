@@ -12,14 +12,14 @@ def load_baseline_metadata(json_file, shared_array):
         baseline_metadata = json.load(f)
 
     np_array = shared_array.get_numpy_handle()
-    shared_array.get_lock().acquire()
+    shared_array.get_lock().acquire()  # locking the shared memory array for reading
 
     for i, entry in enumerate(baseline_metadata):
         np_array[i, 0] = entry["hash"]
         np_array[i, 1] = entry["size"]
         np_array[i, 2] = entry["timestamp"]
 
-    shared_array.get_lock().release()
+    shared_array.get_lock().release()  # release the lock after reading the data
 
 
 def calculate_file_metadata(file_path, hash_algorithm="md5"):
@@ -87,7 +87,7 @@ def worker_process(queue, shared_array, progress_counter, stop_event, alert_list
                 continue
 
             # Compare with baseline
-            # with lock:
+
             np_array = shared_array.get_numpy_handle()
             shared_array.get_lock().acquire()
             baseline_hashes = np_array[:, 0]
